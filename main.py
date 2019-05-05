@@ -73,14 +73,16 @@ class Automate(Fichier) :
 
 	def recherche_transi(self,etat_depart,symbole):
 		etat_term = ""
+		
 		transi = Automate.transition(self)
 		for i in range(int(Automate.nb_transition(self))):
 			if transi[i][0] == str(etat_depart) and transi[i][1] == symbole:
 				#type(transi[i][2])
-				etat_term += transi[i][2]+","
+				etat_term += transi[i][2]
 		return etat_term
 
 	def table_transition(self):
+		j=0
 		table = []
 		transi = Automate.transition(self)
 		symbole = Automate.list_symbole(self)
@@ -99,10 +101,59 @@ class Automate(Fichier) :
 			
 
 		for i in range(int(Automate.nb_etat(self))):
+			print i,"|",
 			for j in range(int(Automate.nb_symbole(self))):
-				print table[i][j],
-			print "\n"
+				print table[i][j],"|",
+			print "\n--"
+#######################################################################
+	def est_un_automate_asynchrone(self):
+		transi = Automate.transition(self)
+		for i in range(int(Automate.nb_transition(self))):
+			if transi[i][1] == "*":
+				return True
+		return False
 
+	def etat_meme_symbole(self):
+		cmpt = 0
+		transi = Automate.transition(self)
+		symbole = Automate.list_symbole(self)
+
+		for i in range(int(Automate.nb_transition(self))):
+			for j in range(int(Automate.nb_transition(self))):
+				if transi[i][1] == transi[j][1] and transi[i][0] == transi[j][0]:
+					cmpt+=1
+					if cmpt>1 : 
+						return False
+			cmpt = 0
+		return True
+
+	def est_un_automate_deterministe(self):
+		if Automate.nb_etat_init(self) == 1 and Automate.etat_meme_symbole(self):
+			return True
+		return "Il n a pas une seule entree ou Il y a des etats d ou sort plus d une fleche libellee par le meme caractere."
+
+	def est_un_automate_complet(self):
+		cmpt = 0
+		cmpt_bis = 0
+		transi = Automate.transition(self)
+		symbole = Automate.list_symbole(self)
+		if int(Automate.nb_symbole(self)==1):
+			return True
+
+		for i in range(int(Automate.nb_transition(self))):
+			for j in range(int(Automate.nb_transition(self))):
+				if transi[i][1] != transi[j][1] and transi[i][0] == transi[j][0]:
+					cmpt+=1
+					
+			if cmpt == (int(Automate.nb_symbole(self))-1) : 
+				cmpt_bis+=1
+			#print cmpt,
+			cmpt = 0
+			#print "-",cmpt_bis
+		if cmpt_bis == int(Automate.nb_etat(self))*2:
+			return True
+		return False
+		
 ##########################################################################
 
 def menu():
@@ -110,7 +161,7 @@ def menu():
 	if num_fichier==1 : 
 		return "L2-F5-nb.txt"
 	else: 
-		return "L2-F5-nb.txt"
+		return "L2-F5-05.txt"
 
 ##########################################################################
 
@@ -134,10 +185,14 @@ def test():
 	print "transition        : ",auto_data.transition()
 	print "table de transi   : \n"
 	auto_data.table_transition()
+	print "----------------------------------------------------------"
+	print "asynchrone        : ",auto_data.est_un_automate_asynchrone()
+	print "deterministe      : ",auto_data.est_un_automate_deterministe()
+	print "complet           :",auto_data.est_un_automate_complet()
 
 ########################################################################
 
-stop = "n"
-while stop == "n":
+encore = "o"
+while encore == "o":
 	test()
-	stop = raw_input("voulez vous arreter ? ( o - n ) : ")
+	encore = raw_input("voulez vous continuer ? ( o - n ) : ")
