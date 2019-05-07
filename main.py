@@ -124,11 +124,12 @@ class Automate(Fichier) :
 					cmpt+=1
 					if cmpt>1 : 
 						return False
+			#print "-",cmpt
 			cmpt = 0
 		return True
 
 	def est_un_automate_deterministe(self):
-		if Automate.nb_etat_init(self) == 1 and Automate.etat_meme_symbole(self):
+		if Automate.nb_etat_init(self)==1 and Automate.etat_meme_symbole(self):
 			return True
 		return "Il n a pas une seule entree ou Il y a des etats d ou sort plus d une fleche libellee par le meme caractere."
 
