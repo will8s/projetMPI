@@ -69,7 +69,7 @@ class Automate(Fichier) :
 		auto_bis = auto[5:]
 		
 		for i in range(int(Automate.nb_transition(self))):
-			for k in range(int(Automate.nb_symbole(self))):
+			for k in range(int(Automate.nb_symbole(self))+1):
 				if liste_symb[k] in auto_bis[i]:
 					auto_bis[i] = auto_bis[i].split(liste_symb[k])
 					auto_bis[i].insert(1,liste_symb[k])
@@ -106,10 +106,7 @@ class Automate(Fichier) :
 
 		for i in range(int(Automate.nb_etat(self))):
 			print i,"|",
-			
 			for j in range(int(Automate.nb_symbole(self))):
-				if table[i][j] == "*":
-					print " ",
 				print table[i][j],"|",
 			print "\n--"
 #######################################################################
