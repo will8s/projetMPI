@@ -1,6 +1,6 @@
 import os
 
-os.chdir(r'C:\Users\willi\Documents\projetMPI')
+os.chdir(r'C:\Users\willi\Documents\projetMPI\AUtomatetest-F5')
 
 class Fichier :
 	nom_fichier=""
@@ -63,13 +63,17 @@ class Automate(Fichier) :
 
 	def transition(self):
 		auto = Fichier.ouvrir_fichier(self)
+		liste_symb = Automate.list_symbole(self)
+		liste_symb.append("*")
+
 		auto_bis = auto[5:]
-		auto = []
+		
 		for i in range(int(Automate.nb_transition(self))):
-			auto.append([])
-			for j in range(3):
-				auto[i].append(auto_bis[i][j])
-		return auto
+			for k in range(int(Automate.nb_symbole(self))):
+				if liste_symb[k] in auto_bis[i]:
+					auto_bis[i] = auto_bis[i].split(liste_symb[k])
+					auto_bis[i].insert(1,liste_symb[k])
+		return auto_bis
 
 	def recherche_transi(self,etat_depart,symbole):
 		etat_term = ""
@@ -102,7 +106,10 @@ class Automate(Fichier) :
 
 		for i in range(int(Automate.nb_etat(self))):
 			print i,"|",
+			
 			for j in range(int(Automate.nb_symbole(self))):
+				if table[i][j] == "*":
+					print " ",
 				print table[i][j],"|",
 			print "\n--"
 #######################################################################
@@ -158,11 +165,15 @@ class Automate(Fichier) :
 ##########################################################################
 
 def menu():
-	num_fichier = input("donnez le num du fichier qui contient l'automate que vous voulez (1-3) : ")
+	num_fichier = input("donnez le num du fichier qui contient l'automate que vous voulez (1-5-32) : ")
 	if num_fichier==1 : 
 		return "L2-F5-nb.txt"
-	else: 
+	elif num_fichier == 5: 
 		return "L2-F5-05.txt"
+	elif num_fichier == 32 :
+		return "L2-F5-32.txt"
+	elif num_fichier == 31 :
+		return "L2-F5-31.txt"
 
 ##########################################################################
 
@@ -189,7 +200,7 @@ def test():
 	print "----------------------------------------------------------"
 	print "asynchrone        : ",auto_data.est_un_automate_asynchrone()
 	print "deterministe      : ",auto_data.est_un_automate_deterministe()
-	print "complet           :",auto_data.est_un_automate_complet()
+	print "complet           : ",auto_data.est_un_automate_complet()
 
 ########################################################################
 
