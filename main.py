@@ -105,9 +105,19 @@ class Automate(Fichier) :
 			
 
 		for i in range(int(Automate.nb_etat(self))):
-			print i,"|",
+			if i<10:
+				print "0"+str(i),"|",
+			else:	
+				print i,"|",
 			for j in range(int(Automate.nb_symbole(self))):
-				print table[i][j],"|",
+				if table[i][j]=="" and int(Automate.nb_etat(self))>9:
+					print "  ","|",
+				elif table[i][j]=="":
+					print " ","|",
+				elif int(table[i][j])<10 and int(Automate.nb_etat(self))>9:
+					print "0"+table[i][j],"|",
+				else:
+				    print table[i][j],"|",
 			print "\n--"
 #######################################################################
 	def est_un_automate_asynchrone(self):
