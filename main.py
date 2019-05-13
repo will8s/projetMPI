@@ -75,7 +75,7 @@ class Automate(Fichier) :
 					auto_bis[i].insert(1,liste_symb[k])
 		return auto_bis
 
-	def recherche_transi(self,etat_depart,symbole):
+	def recherche_transi_termi(self,etat_depart,symbole):
 		etat_term = ""
 		
 		transi = Automate.transition(self)
@@ -83,6 +83,16 @@ class Automate(Fichier) :
 			if transi[i][0] == str(etat_depart) and transi[i][1] == symbole:
 				#type(transi[i][2])
 				etat_term += transi[i][2]
+		return etat_term
+
+	def recherche_transi_depart(self,etat_termi,symbole):
+		etat_term = ""
+		
+		transi = Automate.transition(self)
+		for i in range(int(Automate.nb_transition(self))):
+			if transi[i][2] == str(etat_termi) and transi[i][1] == symbole:
+				#type(transi[i][2])
+				etat_term += transi[i][0]
 		return etat_term
 
 	def table_transition(self):
@@ -96,15 +106,18 @@ class Automate(Fichier) :
 			table.append([])
 			for j in range(int(Automate.nb_symbole(self))):
 				#print Automate.recherche_transi(self,i,symbole[j])
-				if Automate.recherche_transi(self,i,symbole[j]) == None:
+				if Automate.recherche_transi_termi(self,i,symbole[j]) == None:
 					table[i].append(" ")
 			
-				table[i].append(Automate.recherche_transi(self,i,symbole[j]))
+				table[i].append(Automate.recherche_transi_termi(self,i,symbole[j]))
 				#print "j : ",j,range(int(Automate.nb_symbole(self)))	
 			#print Automate.recherche_transi(self,i,symbole[1])
 			
 
 		for i in range(int(Automate.nb_etat(self))):
+			if str(i) in Automate.list_etat_init(self):
+				print "\n-->>"
+
 			if i<10:
 				print "0"+str(i),"|",
 			else:	
@@ -118,7 +131,12 @@ class Automate(Fichier) :
 					print "0"+table[i][j],"|",
 				else:
 				    print table[i][j],"|",
-			print "\n--"
+
+			if str(i) in Automate.list_etat_termi(self):
+				print "\n<<--"
+			elif str(i+1) not in Automate.list_etat_init(self):
+				print "\n--"
+
 #######################################################################
 	def est_un_automate_asynchrone(self):
 		transi = Automate.transition(self)
@@ -168,19 +186,29 @@ class Automate(Fichier) :
 		if cmpt_bis == int(Automate.nb_etat(self))*2:
 			return True
 		return False
+
+		def determinisation(self):
+			listetat_init = Automate.list_etat_init(self)
+			listetat_termi = Automate.list_etat_termi(self)
+			liste_symb = Automate.list_symbole(self)
+			transi = Automate.transition(self)
+
+			new_transi = []
+
+			if Automate.nb_etat_init(self) == 1:
+				for x in list_symb:
+					Automate.recherche_transi_depart(self,listetat_init[0],x)
+
 		
 ##########################################################################
 
 def menu():
-	num_fichier = input("donnez le num du fichier qui contient l'automate que vous voulez (1-5-32) : ")
-	if num_fichier==1 : 
-		return "L2-F5-nb.txt"
-	elif num_fichier == 5: 
-		return "L2-F5-05.txt"
-	elif num_fichier == 32 :
-		return "L2-F5-32.txt"
-	elif num_fichier == 31 :
-		return "L2-F5-31.txt"
+	num_fichier = int(input("donnez le num du fichier qui contient l'automate que vous voulez (1-5-32) : "))
+	if num_fichier<10 and num_fichier>0:
+		num_fichier = "0"+str(num_fichier)
+		return "L2-F5-"+str(num_fichier)+".txt"
+	if num_fichier<45 and num_fichier>0: 
+		return "L2-F5-"+str(num_fichier)+".txt"
 
 ##########################################################################
 
