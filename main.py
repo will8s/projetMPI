@@ -1,6 +1,7 @@
-import os
+import os,sys
+#os.chdir(r'C:\Users\willi\Documents\projetMPI\AUtomatetest-F5')
 
-os.chdir(r'C:\Users\willi\Documents\projetMPI\AUtomatetest-F5')
+path = os.path.dirname(sys.argv[0])+"\Automatetest-F5\\"
 
 class Fichier :
 	nom_fichier=""
@@ -9,7 +10,7 @@ class Fichier :
 		self.nom_fichier = nom_fichier
 
 	def ouvrir_fichier(self):
-		with open(self.nom_fichier, 'r') as fichier_automate:
+		with open(path + self.nom_fichier, 'r') as fichier_automate:
 			automate = (fichier_automate.read()).split("\n")
 		return automate
 
