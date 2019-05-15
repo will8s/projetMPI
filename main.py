@@ -17,14 +17,15 @@ class Fichier :
 class Automate(Fichier) :
 	def __init__(self,nom_fichier):
 		auto = Fichier.__init__(self,nom_fichier)
-
-	def nb_symbole(self):
+		self.automate = Fichier.ouvrir_fichier(self)
+		self.nb_symbole = self.automate[0]
+	"""def nb_symbole(self):
 		auto = Fichier.ouvrir_fichier(self)
-		return auto[0]
+		return auto[0]"""
 
 	def list_symbole(self):
 	 	alpha = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
-	 	nb = Automate.nb_symbole(self)
+	 	nb = self.nb_symbole
 	 	symbole = alpha[:int(nb)]
 	 	return symbole
 
@@ -70,7 +71,7 @@ class Automate(Fichier) :
 		auto_bis = auto[5:]
 		
 		for i in range(int(Automate.nb_transition(self))):
-			for k in range(int(Automate.nb_symbole(self))+1):
+			for k in range(int(self.nb_symbole)+1):
 				if liste_symb[k] in auto_bis[i]:
 					auto_bis[i] = auto_bis[i].split(liste_symb[k])
 					auto_bis[i].insert(1,liste_symb[k])
@@ -105,13 +106,13 @@ class Automate(Fichier) :
 		for i in range(int(Automate.nb_etat(self))):
 			#print "i : ",i,range(int(Automate.nb_etat(self)))
 			table.append([])
-			for j in range(int(Automate.nb_symbole(self))):
+			for j in range(int(self.nb_symbole)):
 				#print Automate.recherche_transi(self,i,symbole[j])
 				if Automate.recherche_transi_termi(self,i,symbole[j]) == None:
 					table[i].append(" ")
 			
 				table[i].append(Automate.recherche_transi_termi(self,i,symbole[j]))
-				#print "j : ",j,range(int(Automate.nb_symbole(self)))	
+				#print "j : ",j,range(int(self.nb_symbole))	
 			#print Automate.recherche_transi(self,i,symbole[1])
 			
 
@@ -123,7 +124,7 @@ class Automate(Fichier) :
 				print "0"+str(i),"|",
 			else:	
 				print i,"|",
-			for j in range(int(Automate.nb_symbole(self))):
+			for j in range(int(self.nb_symbole)):
 				if table[i][j]=="" and int(Automate.nb_etat(self))>9:
 					print "  ","|",
 				elif table[i][j]=="":
@@ -138,7 +139,7 @@ class Automate(Fichier) :
 			elif str(i+1) not in Automate.list_etat_init(self):
 				print "\n--"
 
-#######################################################################
+###################################Determinisation et completion####################################
 	def est_un_automate_asynchrone(self):
 		transi = Automate.transition(self)
 		for i in range(int(Automate.nb_transition(self))):
@@ -171,7 +172,7 @@ class Automate(Fichier) :
 		cmpt_bis = 0
 		transi = Automate.transition(self)
 		symbole = Automate.list_symbole(self)
-		if int(Automate.nb_symbole(self)==1):
+		if int(self.nb_symbole==1):
 			return True
 
 		for i in range(int(Automate.nb_transition(self))):
@@ -179,7 +180,7 @@ class Automate(Fichier) :
 				if transi[i][1] != transi[j][1] and transi[i][0] == transi[j][0]:
 					cmpt+=1
 					
-			if cmpt == (int(Automate.nb_symbole(self))-1) : 
+			if cmpt == (int(self.nb_symbole)-1) : 
 				cmpt_bis+=1
 			#print cmpt,
 			cmpt = 0
@@ -187,20 +188,48 @@ class Automate(Fichier) :
 		if cmpt_bis == int(Automate.nb_etat(self))*2:
 			return True
 		return False
+	"""
+	def determinisation(self):
+		listetat_init = Automate.list_etat_init(self)
+		listetat_termi = Automate.list_etat_termi(self)
+		liste_symb = Automate.list_symbole(self)
+		transi = Automate.transition(self)
+		nb_transi = Automate.nb_transition(self)
 
-		def determinisation(self):
-			listetat_init = Automate.list_etat_init(self)
-			listetat_termi = Automate.list_etat_termi(self)
-			liste_symb = Automate.list_symbole(self)
-			transi = Automate.transition(self)
+		new_transi = []
+		stock = []
+		i = 0
 
-			new_transi = []
+		for i in listetat_init:
+			for s in liste_symb:
+				stock[k].append([i,s,Automate.recherche_transi_termi(self,i,s)])
 
-			if Automate.nb_etat_init(self) == 1:
-				for x in list_symb:
-					Automate.recherche_transi_depart(self,listetat_init[0],x)
+		for x in transi:
+			for y in nb_transi:
+				for s in liste_symb:
+					if y == Automate.recherche_transi_termi(self,y,s)
+						stock = [y,s,]
+				new_transi[i].append([int(x)+1,s,Automate.recherche_transi_depart(self,,s)])
+				i+=1
+	"""
+##########################################################################
+#####################################Standardisation#####################################
+	def standardisation(self):
+		new_etat = "i"
+		stock = []
+		i = 0
 
-		
+		if Automate.nb_etat_init(self)==1:
+			for x in Automate.transition(self):
+				if x[2] in Automate.list_etat_init(self):#on verifie si la transition sortante est reliee e une entree
+					return True
+		else: 
+			for x in Automate.transition(self):
+				if x[0] in Automate.list_etat_init(self):#on debute la creation de la transition
+					stock.append([new_etat,x[1],x[2]])
+			print stock
+
+
 ##########################################################################
 
 def menu():
@@ -222,7 +251,7 @@ def test():
 
 	print auto_data.nom_fichier
 	
-	print "\nnb symbole        : ",auto_data.nb_symbole()
+	print "\nnb symbole        : ",auto_data.nb_symbole
 	print "liste symboles    : ",auto_data.list_symbole()
 	print "nb etat           : ",auto_data.nb_etat()
 	print "nb etat init      : ",auto_data.nb_etat_init()
@@ -237,6 +266,7 @@ def test():
 	print "asynchrone        : ",auto_data.est_un_automate_asynchrone()
 	print "deterministe      : ",auto_data.est_un_automate_deterministe()
 	print "complet           : ",auto_data.est_un_automate_complet()
+	print "standardisation   : ",auto_data.standardisation()
 
 ########################################################################
 
