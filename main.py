@@ -111,32 +111,51 @@ class Automate(Fichier) :
 		symbole = Automate.list_symbole(self)
 		etat=[]
 
+		######## ajout de l'etat i
 		if "i" in self.list_etat_init:
 			for x in range(int(self.nb_etat)-1):
 				etat.append(str(x))
 			etat.append("i")
+		########
 		else:
 			for x in range(int(self.nb_etat)):
 				etat.append(str(x))
+		
+		######## ajout de l'etat p et i
+		presence_p = 0
+		for x in self.transition:
+			for y in range(3):
+				if "p" == x[y]:#on verifie si l etat poubelle est utilise
+					presence_p = 1
+		if presence_p == 1 and "i" in self.list_etat_init:
+			etat = []
+			for x in range(int(self.nb_etat)-2):
+				etat.append(str(x))
+			etat.append("i")
+			etat.append("p")
+		######## ajout de l'etat p
+		elif presence_p == 1:
+			etat = []
+			for x in range(int(self.nb_etat)-1):
+				etat.append(str(x))
+			etat.append("p")
+		print "etat === ",etat
+		########
 
 		for i in range(int(self.nb_etat)):
-			#print "i : ",i,range(int(self.nb_etat))
 			table.append([])
 			for j in range(int(self.nb_symbole)):
-				#print Automate.recherche_transi(self,i,symbole[j])
-
-				if Automate.recherche_transi_termi(self,etat[i],symbole[j]) == None:
+				if Automate.recherche_transi_termi(self,etat[i],symbole[j]) == "p":
+					table[i].append("p")
+				elif Automate.recherche_transi_termi(self,etat[i],symbole[j]) == None:
 					table[i].append(" ")
-			
-				table[i].append(Automate.recherche_transi_termi(self,etat[i],symbole[j]))
+				else:
+					table[i].append(Automate.recherche_transi_termi(self,etat[i],symbole[j]))
 
-				#print "j : ",j,range(int(self.nb_symbole))	
-			#print Automate.recherche_transi(self,i,symbole[1])
-		
+		print "table === ",table		
 		for i in range(int(self.nb_etat)):
 			if str(etat[i]) in self.list_etat_init:
 				print "\n-->>"#les entree sont placees au dessus des etats
-
 			if i<10:
 				print "0"+etat[i],"|",
 			else:	
@@ -146,8 +165,12 @@ class Automate(Fichier) :
 					print "  ","|",
 				elif table[i][j]=="":
 					print " ","|",
-				elif int(table[i][j])<10 and int(self.nb_etat)>9:
-					print "0"+table[i][j],"|",
+				elif (table[i][j]=="p" and (int(self.nb_etat)-1)>9):
+					print ".p","|",
+				elif "p" in table[i][j] or table[i][j]=="p":
+					print "p","|",
+				elif (int(table[i][j])<10 and int(self.nb_etat)>9):
+					print "."+table[i][j],"|",
 				else:
 				    print table[i][j],"|",
 
@@ -155,7 +178,7 @@ class Automate(Fichier) :
 				print "\n<<--"#les sorties sont placees en dessous des etats
 			elif str(i+1) not in self.list_etat_init:
 				print "\n--"
-
+		
 ###################################Determinisation et completion####################################
 	def est_un_automate_asynchrone(self):
 		transi = self.transition
@@ -205,7 +228,7 @@ class Automate(Fichier) :
 		if cmpt_bis == int(self.nb_etat)*2:
 			return True
 		return False
-	"""
+	
 	def determinisation(self):
 		listetat_init = self.list_etat_init
 		listetat_termi = self.list_etat_termi
@@ -215,12 +238,45 @@ class Automate(Fichier) :
 
 		new_transi = []
 		stock = []
-		i = 0
+		stock_associ = []
 
 		for i in listetat_init:
-			for s in liste_symb:
-				stock[k].append([i,s,Automate.recherche_transi_termi(self,i,s)])
+			for t in transi:
+				if t[0]==i:
+					stock.append([i,t[1],t[2]])
+		#print "stock",stock
 
+		save = [[],[],[]]
+
+		for i in stock:
+			for x in range(3):
+				#save=i[x]
+				save[x].append(i[x])
+		stock_associ = save
+
+		#print "stock_asso",stock_associ
+
+		save=[[],[],[]]
+
+		for T in range(len(stock_associ)):
+			for x in range(len(transi)):
+				if transi[0] in stock_associ[2]:
+					for etat in range(3):
+						save[etat].append(x[etat])
+						#stock_associ[-1].append(x[etat])
+			stock_associ.append(save)
+			save=[[],[],[]]
+		#print stock_associ
+		"""		
+		for i in stock:
+			for t in transi:
+				if t[0]==i[0]:
+					stock.append([i,t[1],t[2]])
+
+		print "stock---",stock
+		"""
+
+		"""
 		for x in transi:
 			for y in nb_transi:
 				for s in liste_symb:
@@ -228,7 +284,32 @@ class Automate(Fichier) :
 						stock = [y,s,]
 				new_transi[i].append([int(x)+1,s,Automate.recherche_transi_depart(self,,s)])
 				i+=1
-	"""
+		"""
+	def completion(self):
+
+		new_transi = []
+		compt_transi = 0
+		for i in range(int(self.nb_etat)):
+			for s in Automate.list_symbole(self):
+				if Automate.recherche_transi_termi(self,i,s)=="":
+					new_transi.append([str(i),s,"p"])					
+		for s in Automate.list_symbole(self):			
+			new_transi.append(["p",s,"p"])
+		print new_transi
+
+		for x in new_transi:
+			self.transition.append(x)
+			compt_transi+=1
+
+		self.nb_transition = int(self.nb_transition)
+		self.nb_transition += compt_transi
+		self.nb_transition = str(self.nb_transition)
+		self.nb_etat = int(self.nb_etat)
+		self.nb_etat += 1
+		self.nb_etat = str(self.nb_etat)
+
+		print Automate.table_transition(self)
+	
 ##########################################################################
 #####################################Standardisation#####################################
 	def standardisation(self):
@@ -293,8 +374,11 @@ def test():
 	print "asynchrone        : ",auto_data.est_un_automate_asynchrone()
 	print "deterministe      : ",auto_data.est_un_automate_deterministe()
 	print "complet           : ",auto_data.est_un_automate_complet()
+	print "completion        : ",auto_data.completion()
+	#print "determinisation   : ",auto_data.determinisation()
 	print "----------------------------------------------------------"
-	print "standardisation   : ",auto_data.standardisation()
+	#print "standardisation   : ",auto_data.standardisation()
+
 
 
 
@@ -303,4 +387,4 @@ def test():
 encore = "o"
 while encore == "o":
 	test()
-	encore = raw_input("voulez vous continuer ? ( o - n ) : ")
+	encore = raw_input("voulez vous continuer ? ( o - n ) : ") 
